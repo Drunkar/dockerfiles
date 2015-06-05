@@ -1,4 +1,4 @@
-# dockerfile_elasticsearch
+# elasticsearch
 dockerfile for custom elasticsearch
 
 ### plugins
