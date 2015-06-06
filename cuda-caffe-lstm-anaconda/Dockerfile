@@ -127,3 +127,10 @@ RUN cd /opt/caffe && echo "CXX := /usr/bin/g++-4.8" >> Makefile.config
 RUN cd /opt/caffe && sed -i 's/atlas/open/' Makefile.config
 RUN cd /opt/caffe && sed -i 's/CXX :=/CXX ?=/' Makefile
 RUN cd /opt/caffe && make all
+
+##############################################################################
+# settings
+##############################################################################
+RUN mkdir /workspace
+VOLUME ["/workspace"]
+WORKDIR /workspace
