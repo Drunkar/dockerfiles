@@ -129,6 +129,17 @@ RUN cd /opt/caffe && sed -i 's/CXX :=/CXX ?=/' Makefile
 RUN cd /opt/caffe && make all
 
 ##############################################################################
+# pycaffe
+##############################################################################
+RUN cd /opt/caffe/python
+RUN pip install -r requirements.txt
+RUN cd ../
+RUN make pycaffe
+
+ENV PYTHONPATH /opt/caffe/python/:${PYTHONPATH}
+
+
+##############################################################################
 # settings
 ##############################################################################
 RUN mkdir /workspace
