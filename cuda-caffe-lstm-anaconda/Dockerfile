@@ -131,10 +131,13 @@ RUN cd /opt/caffe && make all
 ##############################################################################
 # pycaffe
 ##############################################################################
-RUN cd /opt/caffe/python
-RUN pip install -r requirements.txt
-RUN cd ../
-RUN make pycaffe
+RUN pip install -r /opt/caffe/python/requirements.txt
+RUN echo "ANACONDA_HOME := /opt/conda" >> /opt/caffe/Makefile.config
+RUN echo 'PYTHON_INCLUDE := $(ANACONDA_HOME)/include $(ANACONDA_HOME)/include/python2.7 $(ANACONDA_HOME)/lib/python2.7/site-packages/numpy/core/include' >> /opt/caffe/Makefile.config
+RUN echo 'PYTHON_LIB := $(ANACONDA_HOME)/lib' >> /opt/caffe/Makefile.config
+RUN echo 'INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include' >> /opt/caffe/Makefile.config
+RUN echo 'LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib' >> /opt/caffe/Makefile.config
+RUN cd /opt/caffe && make pycaffe
 
 ENV PYTHONPATH /opt/caffe/python/:${PYTHONPATH}
 
