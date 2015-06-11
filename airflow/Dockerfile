@@ -14,12 +14,11 @@ RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.2.0-Linux-x86_64.s
 ENV PATH /opt/conda/bin:$PATH
 
 # install airflow
-ENV AIRFLOW_HOME = /airflow
+ENV AIRFLOW_HOME /airflow
 RUN pip install --default-timeout 6000 airflow
 
 # initialize the database
 RUN airflow initdb
-
 
 # locale for tokyo
 RUN cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
@@ -27,6 +26,9 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+
+VOLUME["/airflow"]
+WORKDIR /airflow
 
 EXPOSE 8080
 
