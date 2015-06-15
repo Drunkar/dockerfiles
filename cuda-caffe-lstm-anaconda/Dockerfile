@@ -140,6 +140,7 @@ RUN echo 'LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib' >> /opt/caffe/M
 RUN cd /opt/caffe && make pycaffe
 
 ENV PYTHONPATH /opt/caffe/python/:${PYTHONPATH}
+RUN ln /dev/null /dev/raw1394
 
 
 ##############################################################################
