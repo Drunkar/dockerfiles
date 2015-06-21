@@ -140,12 +140,30 @@ RUN echo 'LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib' >> /opt/caffe/M
 RUN cd /opt/caffe && make pycaffe
 
 ENV PYTHONPATH /opt/caffe/python/:${PYTHONPATH}
-RUN ln /dev/null /dev/raw1394
+RUN echo "ln /dev/null /dev/raw1394" >> /etc/profile.d/caffeenv.sh
 
+
+##############################################################################
+# ipython notebook
+##############################################################################
+RUN ipython profile create nbserver
+# Configure "nbserver" profile
+RUN sed -i \
+        -e "s/^# c.NotebookApp.ip = 'localhost'$/c.NotebookApp.ip = '0.0.0.0'/" \
+        -e "s/^# c.NotebookApp.port = 8888$/c.NotebookApp.port = 8888/" \
+        -e "s;^# c.NotebookApp.notebook_dir = '/.*'$;c.NotebookApp.notebook_dir = '/notebook';" \
+        -e "s/^# c.NotebookApp.open_browser = True$/c.NotebookApp.open_browser = False/" \
+        -e "s/^# c.IPKernelApp.matplotlib = None$/c.IPKernelApp.matplotlib = 'inline'/" \
+        -e "s/^# c.IPKernelApp.extensions = \[\]$/c.IPKernelApp.extensions = ['version_information']/" \
+        /root/.ipython/profile_nbserver/ipython_notebook_config.py
+
+EXPOSE 8888
 
 ##############################################################################
 # settings
 ##############################################################################
 RUN mkdir /workspace
-VOLUME ["/workspace"]
+VOLUME ["/workspace", "/notebook"]
 WORKDIR /workspace
+
+ENTRYPOINT bash /etc/profile.d/caffeenv.sh && ipython notebook --profile=nbserver
