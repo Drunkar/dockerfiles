@@ -4,7 +4,7 @@ MAINTAINER drunkar <drunkars.p@gmail.com>
 # Install wget and build-essential
 RUN apt-get update && apt-get install -y \
   build-essential \
-  wget && \
+  wget \
   doxygen doxygen-gui graphviz
 
 
