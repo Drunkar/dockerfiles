@@ -162,8 +162,11 @@ EXPOSE 8888
 ##############################################################################
 # settings
 ##############################################################################
+# copy caffe example notebook
+RUN cp /opt/caffe/examples/*ipynb /notebook/
 RUN mkdir /workspace
 VOLUME ["/workspace", "/notebook"]
-WORKDIR /workspace
 
 ENTRYPOINT bash /etc/profile.d/caffeenv.sh && ipython notebook --profile=nbserver
+
+WORKDIR /workspace
