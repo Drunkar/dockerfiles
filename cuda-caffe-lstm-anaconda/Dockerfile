@@ -164,6 +164,7 @@ EXPOSE 8888
 # settings
 ##############################################################################
 # copy caffe example notebook
+RUN mkdir /notebook
 RUN cp /opt/caffe/examples/*ipynb /notebook/
 RUN mkdir /workspace
 VOLUME ["/workspace", "/notebook"]
