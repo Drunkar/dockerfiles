@@ -3,8 +3,7 @@ MAINTAINER drunkar <drunkars.p@gmail.com>
 
 # Install Anaconda
 RUN apt-get update && \
-    apt-get install -y wget bzip2 ca-certificates libmysqlclient-dev && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y wget bzip2 ca-certificates libmysqlclient-dev
 
 RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.2.0-Linux-x86_64.sh && \
     /bin/bash /Anaconda-2.2.0-Linux-x86_64.sh -b -p /opt/conda && \
@@ -22,12 +21,17 @@ ENV LC_ALL en_US.UTF-8
 
 # install airflow
 ENV AIRFLOW_HOME /airflow
-RUN pip install --default-timeout 6000 airflow[mysql]
+RUN pip install --default-timeout 6000 airflow
+ADD airflow.cfg $AIRFLOW_HOME/airflow.cfg
+
 
 VOLUME ["/airflow"]
 WORKDIR /airflow
 
 EXPOSE 8080
+
+# celery flower
+EXPOSE 8383
 
 
 # Define default command.
