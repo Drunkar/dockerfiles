@@ -3,7 +3,7 @@ MAINTAINER drunkar <drunkars.p@gmail.com>
 
 # Install Anaconda
 RUN apt-get update && \
-    apt-get install -y wget bzip2 ca-certificates libmysqlclient-dev
+    apt-get install -y wget bzip2 ca-certificates libmysqlclient-dev mysql-client
 
 RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.2.0-Linux-x86_64.sh && \
     /bin/bash /Anaconda-2.2.0-Linux-x86_64.sh -b -p /opt/conda && \
@@ -21,18 +21,16 @@ ENV LC_ALL en_US.UTF-8
 
 # install airflow
 ENV AIRFLOW_HOME /airflow
-RUN pip install --default-timeout 6000 airflow
-ADD airflow.cfg $AIRFLOW_HOME/airflow.cfg
+ENV C_FORCE_ROOT true  # run airflow worker by root
+RUN pip install --default-timeout 6000 airflow[mysql]
+ADD entrypoint.sh /root/entrypoint.sh
+RUN chmod +x /root/entrypoint.sh
 
-
-VOLUME ["/airflow"]
+VOLUME ["/airflow/dags", "airflow/logs"]
 WORKDIR /airflow
 
 EXPOSE 8080
+EXPOSE 5555
+EXPOSE 8793
 
-# celery flower
-EXPOSE 8383
-
-
-# Define default command.
-ENTRYPOINT airflow initdb && airflow webserver -p 8080
+ENTRYPOINT ["/root/entrypoint.sh"]
