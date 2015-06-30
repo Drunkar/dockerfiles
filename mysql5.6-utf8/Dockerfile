@@ -1,17 +1,43 @@
-FROM mysql:5.6
+FROM ubuntu:trusty
+MAINTAINER Drunkar <drunkars.p@gmail.com>
 
-RUN { \
-    echo '[client]'; \
-    echo 'default-character-set = utf8mb4'; \
-    echo '[mysqld]'; \
-    echo 'character-set-server = utf8mb4'; \
-    echo 'skip-character-set-client-handshake'; \
-} > /etc/mysql/my.cnf
+# Install packages
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && \
+  apt-get -yq install mysql-server-5.6 pwgen && \
+  rm -rf /var/lib/apt/lists/*
 
-#ADD charset.cnf /etc/mysql/conf.d/charset.cnf
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+# Remove pre-installed database
+RUN rm -rf /var/lib/mysql/*
+
+# Remove syslog configuration
+RUN rm /etc/mysql/conf.d/mysqld_safe_syslog.cnf
+
+# Add MySQL configuration
+ADD my.cnf /etc/mysql/conf.d/my.cnf
+ADD mysqld_charset.cnf /etc/mysql/conf.d/mysqld_charset.cnf
+
+# Add MySQL scripts
+ADD import_sql.sh /import_sql.sh
+ADD run.sh /run.sh
+RUN chmod 755 /*.sh
+
+# Exposed ENV
+ENV MYSQL_USER admin
+ENV MYSQL_PASS **Random**
+ENV ON_CREATE_DB **False**
+
+# Replication ENV
+ENV REPLICATION_MASTER **False**
+ENV REPLICATION_SLAVE **False**
+ENV REPLICATION_USER replica
+ENV REPLICATION_PASS replica
+
+# ON_CREATE_SCRIPT
+ENV ON_CREATE_DB **False**
+
+# Add VOLUMEs to allow backup of config and databases
+VOLUME  ["/etc/mysql", "/var/lib/mysql"]
 
 EXPOSE 3306
-CMD ["mysqld"]
+CMD ["/run.sh"]
