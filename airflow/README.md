@@ -8,7 +8,7 @@ Use CeleryExecutor and MySQL as its backend.
 1. Run MySQL Container.
 
   ```
-sudo docker run --name airflow-db -e MYSQL_ROOT_PASSWORD=airflow-db -d -v /var/lib/mysql:/var/lib/mysql mysql
+sudo docker run --name airflow-db -e MYSQL_ROOT_PASSWORD=airflow-db -d -v /docker_volumes/airflow-db:/var/lib/mysql mysql
   ```
 
 2. Run Airflow container.
