@@ -39,7 +39,7 @@ default_queue = default
 job_heartbeat_sec = 5
 scheduler_heartbeat_sec = 5
 " \
->> $AIRFLOW_HOME/airflow.cfg
+> $AIRFLOW_HOME/airflow.cfg
 
 
 airflow initdb
