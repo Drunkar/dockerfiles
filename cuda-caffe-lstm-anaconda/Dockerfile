@@ -171,4 +171,4 @@ VOLUME ["/workspace", "/notebook"]
 
 ENTRYPOINT bash /etc/profile.d/caffeenv.sh && ipython notebook --profile=nbserver
 
-WORKDIR /workspace
+WORKDIR /notebook
