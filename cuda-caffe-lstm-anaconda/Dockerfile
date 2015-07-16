@@ -91,7 +91,7 @@ RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-4.8 30 && \
 
 # Clone the Caffe repo 
 RUN cd /opt && git clone https://github.com/jeffdonahue/caffe.git
-RUN cd /opt/caffe && git checkout -b recurrent origin/recurrent
+RUN cd /opt/caffe && git checkout -b recurrent-rebase-cleanup origin/recurrent-rebase-cleanup
 
 # Glog 
 RUN cd /opt && wget https://google-glog.googlecode.com/files/glog-0.3.3.tar.gz && \
@@ -165,10 +165,10 @@ EXPOSE 8888
 ##############################################################################
 # copy caffe example notebook
 RUN mkdir /notebook
-RUN cp /opt/caffe/examples/*ipynb /notebook/
 RUN mkdir /workspace
 VOLUME ["/workspace", "/notebook"]
 
 ENTRYPOINT bash /etc/profile.d/caffeenv.sh && ipython notebook --profile=nbserver
+RUN cp /opt/caffe/examples/*ipynb /notebook/
 
 WORKDIR /notebook
