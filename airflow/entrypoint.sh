@@ -44,4 +44,5 @@ scheduler_heartbeat_sec = 5
 
 airflow initdb
 airflow worker &
+airflow scheduler &
 exec $CMD
