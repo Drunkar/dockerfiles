@@ -26,7 +26,7 @@ RUN pip install --default-timeout 6000 airflow[mysql]
 ADD entrypoint.sh /root/entrypoint.sh
 RUN chmod +x /root/entrypoint.sh
 
-VOLUME ["/airflow/dags", "airflow/logs"]
+VOLUME ["/airflow/dags", "/airflow/logs", "/airflow/scripts"]
 WORKDIR /airflow
 
 EXPOSE 8080
