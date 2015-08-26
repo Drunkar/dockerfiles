@@ -1,6 +1,13 @@
 FROM ubuntu:14.04
 MAINTAINER drunkar <drunkars.p@gmail.com>
 
+# locale for tokyo
+RUN cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
 # Install wget and build-essential
 RUN apt-get update && apt-get install -y \
   build-essential \
