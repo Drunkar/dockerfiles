@@ -22,7 +22,7 @@ ENV LC_ALL en_US.UTF-8
 # install airflow
 ENV AIRFLOW_HOME /airflow
 ENV C_FORCE_ROOT true  # run airflow worker by root
-RUN pip install --default-timeout 6000 airflow[mysql]
+RUN pip install --default-timeout 6000 airflow[mysql] elasticsearch
 ADD entrypoint.sh /root/entrypoint.sh
 RUN chmod +x /root/entrypoint.sh
 
