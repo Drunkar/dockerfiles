@@ -26,7 +26,7 @@ smtp_mail_from = airflow@airflow.com
 
 [celery]
 celery_app_name = airflow.executors.celery_executor
-celeryd_concurrency = 16
+celeryd_concurrency = 200
 worker_log_server_port = 8793
 broker_url = sqla+mysql://root:${MYSQL_ENV_MYSQL_ROOT_PASSWORD}@${MYSQL_PORT_3306_TCP_ADDR}:3306/airflow
 ;broker_url = amqp://guest:guest@${RABBIT_PORT_5672_TCP_ADDR}:5672/airflow
