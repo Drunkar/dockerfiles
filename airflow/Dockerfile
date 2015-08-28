@@ -12,8 +12,7 @@ RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.2.0-Linux-x86_64.s
 
 ENV PATH /opt/conda/bin:$PATH
 
-# locale for tokyo
-RUN cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+# language
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
