@@ -13,6 +13,10 @@ RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.2.0-Linux-x86_64.s
 
 ENV PATH /opt/conda/bin:$PATH
 
+# change default encoding
+RUN echo "import sys\n\
+sys.setdefaultencoding('utf-8')" >> /opt/conda/lib/python2.7/sitecustomize.py
+
 RUN pip install --default-timeout 6000 tornado pycrypto elasticsearch mysql-python
 
 
