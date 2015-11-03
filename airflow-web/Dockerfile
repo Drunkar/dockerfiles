@@ -5,9 +5,9 @@ MAINTAINER drunkar <drunkars.p@gmail.com>
 RUN apt-get update && \
     apt-get install -y wget bzip2 ca-certificates libmysqlclient-dev mysql-client
 
-RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.2.0-Linux-x86_64.sh && \
-    /bin/bash /Anaconda-2.2.0-Linux-x86_64.sh -b -p /opt/conda && \
-    rm /Anaconda-2.2.0-Linux-x86_64.sh && \
+RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.3.0-Linux-x86_64.sh && \
+    /bin/bash Anaconda-2.3.0-Linux-x86_64.sh -b -p /opt/conda && \
+    rm Anaconda-2.3.0-Linux-x86_64.sh && \
     /opt/conda/bin/conda install --yes conda==3.10.1
 
 ENV PATH /opt/conda/bin:$PATH
