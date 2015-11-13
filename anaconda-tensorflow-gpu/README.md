@@ -1,6 +1,5 @@
 # anaconda-tensorflow-gpu
 
-
 default endpoint is jupyter notebook
 
 ```
