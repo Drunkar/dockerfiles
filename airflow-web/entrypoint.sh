@@ -9,7 +9,7 @@ dags_folder = /airflow/dags
 base_log_folder = /airflow/logs
 executor = CeleryExecutor
 sql_alchemy_conn = mysql://root:${MYSQL_ENV_MYSQL_ROOT_PASSWORD}@${MYSQL_PORT_3306_TCP_ADDR}:3306/airflow
-parallelism = 0
+parallelism = 100
 load_examples = False
 
 [webserver]
