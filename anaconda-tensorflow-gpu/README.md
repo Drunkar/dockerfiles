@@ -3,6 +3,8 @@
 default endpoint is jupyter notebook
 
 ```
+DOCKER_NVIDIA_DEVICES="--device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm"
+
 sudo docker run --name tensorflow -v $PWD/notebook:/notebook -p 8888:8888 -p 6006:6006 -d $DOCKER_NVIDIA_DEVICES drunkar/anaconda-tensorflow-gpu /bin/bash
 ```
 
