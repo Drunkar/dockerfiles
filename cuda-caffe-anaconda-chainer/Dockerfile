@@ -65,7 +65,7 @@ RUN pip install --default-timeout 6000 tornado pycrypto elasticsearch mysql-pyth
 
 
 ##############################################################################
-# caffe-gpu lstm
+# caffe-gpu
 ##############################################################################
 # Get dependencies
 RUN apt-get update && apt-get install -y \
