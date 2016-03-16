@@ -151,9 +151,14 @@ RUN echo "ln /dev/null /dev/raw1394" >> /etc/profile.d/caffeenv.sh
 
 
 ##############################################################################
+# chainer
+##############################################################################
+RUN pip install chainer chainer-cuda-deps
+
+###############################################################################
 # jupyter notebook
 ##############################################################################
-RUN ipython profile create nbserver
+RUN jupyter notebook --generate-config
 # Configure "nbserver" profile
 RUN sed -i \
         -e "s/^# c.NotebookApp.ip = 'localhost'$/c.NotebookApp.ip = '0.0.0.0'/" \
@@ -162,16 +167,11 @@ RUN sed -i \
         -e "s/^# c.NotebookApp.open_browser = True$/c.NotebookApp.open_browser = False/" \
         -e "s/^# c.IPKernelApp.matplotlib = None$/c.IPKernelApp.matplotlib = 'inline'/" \
         -e "s/^# c.IPKernelApp.extensions = \[\]$/c.IPKernelApp.extensions = ['version_information']/" \
-        /root/.ipython/profile_nbserver/ipython_config.py
+        /root/.jupyter/jupyter_notebook_config.py
 
 EXPOSE 8888
 
-##############################################################################
-# chainer
-##############################################################################
-RUN pip install chainer chainer-cuda-deps
-
-##############################################################################
+#############################################################################
 # settings
 ##############################################################################
 # copy caffe example notebook
@@ -179,7 +179,7 @@ RUN mkdir /notebook
 RUN mkdir /workspace
 VOLUME ["/workspace", "/notebook"]
 
-ENTRYPOINT bash /etc/profile.d/caffeenv.sh && ipython notebook --profile=nbserver
+ENTRYPOINT bash /etc/profile.d/caffeenv.sh && jupyter notebook
 RUN cp /opt/caffe/examples/*ipynb /notebook/
 
 WORKDIR /notebook
