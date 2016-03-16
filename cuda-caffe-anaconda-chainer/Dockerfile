@@ -50,18 +50,14 @@ RUN apt-get update && \
     apt-get install -y wget bzip2 ca-certificates libmysqlclient-dev && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.3.0-Linux-x86_64.sh && \
-    /bin/bash Anaconda-2.3.0-Linux-x86_64.sh -b -p /opt/conda && \                                 
-    rm Anaconda-2.3.0-Linux-x86_64.sh && \                                                         
-    /opt/conda/bin/conda install --yes conda==3.10.1
+RUN wget --quiet https://repo.continuum.io/archive/Anaconda3-2.4.1-Linux-x86_64.sh && \
+    /bin/bash Anaconda3-2.4.1-Linux-x86_64.sh -b -p /opt/conda && \                                 
+    rm Anaconda3-2.4.1-Linux-x86_64.sh
 
 ENV PATH /opt/conda/bin:$PATH
 
-# change default encoding
-RUN echo "import sys\n\
-sys.setdefaultencoding('utf-8')" >> /opt/conda/lib/python2.7/sitecustomize.py
-
-RUN pip install --default-timeout 6000 tornado pycrypto elasticsearch mysql-python pydot graphviz
+RUN pip install --upgrade pip
+RUN pip install --default-timeout 6000 tornado pycrypto elasticsearch graphviz
 
 
 ##############################################################################
@@ -144,7 +140,7 @@ RUN cd /opt/caffe && make all
 ##############################################################################
 RUN pip install -r /opt/caffe/python/requirements.txt
 RUN echo "ANACONDA_HOME := /opt/conda" >> /opt/caffe/Makefile.config
-RUN echo 'PYTHON_INCLUDE := $(ANACONDA_HOME)/include $(ANACONDA_HOME)/include/python2.7 $(ANACONDA_HOME)/lib/python2.7/site-packages/numpy/core/include' >> /opt/caffe/Makefile.config
+RUN echo 'PYTHON_INCLUDE := $(ANACONDA_HOME)/include $(ANACONDA_HOME)/include/python3.5m $(ANACONDA_HOME)/lib/python3.5/site-packages/numpy/core/include' >> /opt/caffe/Makefile.config
 RUN echo 'PYTHON_LIB := $(ANACONDA_HOME)/lib' >> /opt/caffe/Makefile.config
 RUN echo 'INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include' >> /opt/caffe/Makefile.config
 RUN echo 'LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib' >> /opt/caffe/Makefile.config
@@ -155,7 +151,7 @@ RUN echo "ln /dev/null /dev/raw1394" >> /etc/profile.d/caffeenv.sh
 
 
 ##############################################################################
-# ipython notebook
+# jupyter notebook
 ##############################################################################
 RUN ipython profile create nbserver
 # Configure "nbserver" profile
@@ -166,7 +162,7 @@ RUN sed -i \
         -e "s/^# c.NotebookApp.open_browser = True$/c.NotebookApp.open_browser = False/" \
         -e "s/^# c.IPKernelApp.matplotlib = None$/c.IPKernelApp.matplotlib = 'inline'/" \
         -e "s/^# c.IPKernelApp.extensions = \[\]$/c.IPKernelApp.extensions = ['version_information']/" \
-        /root/.ipython/profile_nbserver/ipython_notebook_config.py
+        /root/.ipython/profile_nbserver/ipython_config.py
 
 EXPOSE 8888
 
