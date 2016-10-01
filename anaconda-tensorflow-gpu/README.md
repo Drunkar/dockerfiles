@@ -1,5 +1,13 @@
 # anaconda-tensorflow-gpu
 
+## Caution
+
+You have to write ``cudnn-7.5-linux-x64-v5.0-ga`` path into ``cuDNN_path.txt``.
+
+During Docker build, it will be downloaded and extracted.
+
+## Usage
+
 default endpoint is jupyter notebook
 
 ```
