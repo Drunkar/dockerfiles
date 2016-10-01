@@ -1,4 +1,8 @@
-FROM ubuntu:14.04
+# Trnsorflow r0.11
+# Ubuntu/Linux 64-bit, GPU enabled, Python 3.5
+# Requires CUDA toolkit 7.5 and CuDNN v5.
+
+FROM ubuntu:16.04
 MAINTAINER drunkar <drunkars.p@gmail.com>
 
 # locale for tokyo
@@ -8,37 +12,32 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
+# enable apt multiverse repository
+RUN apt-get update && \
+    apt-get install -y software-properties-common python-software-properties && \
+    add-apt-repository multiverse
+
+# Disable frontend
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install wget and build-essential
 RUN apt-get update && apt-get install -y \
   build-essential \
-  wget
-
+  wget \
+  linux-generic \
+  nvidia-cuda-toolkit \
+  nvidia-361
 
 ##############################################################################
-# cuda
+# cuDNN 7.5
 ##############################################################################
-# CUDA version - as the kernel is shared the host and container must correspond
-ENV CUDA_MAJOR=7_0 \
-  CUDA_VERSION=7.0.28
-
-# Change to the /tmp directory
-RUN cd /tmp && \
-# Download run file
-  wget --quiet http://developer.download.nvidia.com/compute/cuda/${CUDA_MAJOR}/Prod/local_installers/cuda_${CUDA_VERSION}_linux.run && \
-# Make the run file executable and extract
-  chmod +x cuda_*_linux.run && ./cuda_*_linux.run -extract=`pwd` && \
-# Install CUDA drivers (silent, no kernel)
-  ./NVIDIA-Linux-x86_64-*.run -s --no-kernel-module && \
-# Install toolkit (silent)  
-  ./cuda-linux64-rel-*.run -noprompt && \
-# Clean up
-  rm -rf *
-
-# Add to path
-ENV PATH /usr/local/cuda/bin:${PATH}
-# Configure dynamic link
-RUN echo "/usr/local/cuda/lib64" >> /etc/ld.so.conf && ldconfig
-
+ADD cuDNN_path.txt ./
+RUN . ./cuDNN_path.txt && wget -q ${CUDNN_PATH} -O cudnn.tgz && \
+    tar xzf cudnn.tgz && \
+    cp -a cuda/lib64/* /usr/local/lib/ && \
+    cp -a cuda/include/* /usr/local/include/ && \
+    ldconfig && \
+    rm -R -f cuda cudnn.tgz cuDNN_path.txt
 
 ##############################################################################
 # anaconda python
@@ -48,38 +47,22 @@ RUN apt-get update && \
     apt-get install -y wget bzip2 ca-certificates libmysqlclient-dev && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.3.0-Linux-x86_64.sh && \
-    /bin/bash Anaconda-2.3.0-Linux-x86_64.sh -b -p /opt/conda && \                                 
-    rm Anaconda-2.3.0-Linux-x86_64.sh && \                                                         
-    /opt/conda/bin/conda install --yes conda==3.10.1
+RUN wget --quiet https://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh && \
+    /bin/bash Anaconda3-4.2.0-Linux-x86_64.sh -b -p /opt/conda && \                                 
+    rm Anaconda3-4.2.0-Linux-x86_64.sh
 
 ENV PATH /opt/conda/bin:$PATH
+RUN pip install --upgrade pip
 
-# change default encoding
-RUN echo "import sys\n\
-sys.setdefaultencoding('utf-8')" >> /opt/conda/lib/python2.7/sitecustomize.py
-
-
-##############################################################################
-# ipython notebook
-##############################################################################
-RUN ipython profile create nbserver
-# Configure "nbserver" profile
-RUN sed -i \
-        -e "s/^# c.NotebookApp.ip = 'localhost'$/c.NotebookApp.ip = '0.0.0.0'/" \
-        -e "s/^# c.NotebookApp.port = 8888$/c.NotebookApp.port = 8888/" \
-        -e "s;^# c.NotebookApp.notebook_dir = '/.*'$;c.NotebookApp.notebook_dir = '/notebook';" \
-        -e "s/^# c.NotebookApp.open_browser = True$/c.NotebookApp.open_browser = False/" \
-        -e "s/^# c.IPKernelApp.matplotlib = None$/c.IPKernelApp.matplotlib = 'inline'/" \
-        -e "s/^# c.IPKernelApp.extensions = \[\]$/c.IPKernelApp.extensions = ['version_information']/" \
-        /root/.ipython/profile_nbserver/ipython_notebook_config.py
-
+# for jupyter notebook
 EXPOSE 8888
 
 ##############################################################################
 # tensorflow
 ##############################################################################
-RUN pip install --default-timeout 6000 https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.5.0-cp27-none-linux_x86_64.whl
+ENV TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.11.0rc0-cp35-cp35m-linux_x86_64.whl
+RUN pip install --upgrade -I setuptools
+RUN pip install --upgrade $TF_BINARY_URL
 
 EXPOSE 6006
 
@@ -89,5 +72,5 @@ EXPOSE 6006
 RUN mkdir /notebook
 VOLUME ["/notebook"]
 
-ENTRYPOINT ipython notebook --profile=nbserver
+ENTRYPOINT jupyter notebook --no-browser --ip="0.0.0.0" --port=8888 --notebook-dir="/notebook"
 WORKDIR /notebook
