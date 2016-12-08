@@ -78,9 +78,9 @@ RUN cd /opt && git clone https://github.com/jeffdonahue/caffe.git
 RUN cd /opt/caffe && git checkout -b recurrent-rebase-cleanup origin/recurrent-rebase-cleanup
 
 # Glog 
-RUN cd /opt && wget https://google-glog.googlecode.com/files/glog-0.3.3.tar.gz && \
-  tar zxvf glog-0.3.3.tar.gz && \
-  cd /opt/glog-0.3.3 && \
+RUN cd /opt && wget https://github.com/google/glog/archive/v0.3.4.tar.gz && \
+  tar zxvf glog-0.3.4.tar.gz && \
+  cd /opt/glog-0.3.4 && \
   ./configure && \
   make && \
   make install
