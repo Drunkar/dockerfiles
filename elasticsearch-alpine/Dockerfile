@@ -12,34 +12,6 @@ RUN apk --update add tzdata && \
     rm -rf /var/cache/apk/*
 
 
-ENV ELASTICSEARCH_VERSION=2.4.1
-RUN apk --update --no-cache add openjdk8-jre
-WORKDIR /usr/share
-RUN wget http://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/$ELASTICSEARCH_VERSION/elasticsearch-$ELASTICSEARCH_VERSION.tar.gz -O - | tar xvfz - \
-    && mv elasticsearch-$ELASTIC_VER elasticsearch && cd elasticsearch && rm -rf config bin
-
-# configs
-ADD bin /usr/share/elasticsearch/bin
-ADD config /usr/share/elasticsearch/config
-
-# initialization
-RUN mkdir /usr/share/elasticsearch/plugins /usr/share/elasticsearch/data
-RUN addgroup elastico
-RUN adduser  -G elastico -s /bin/false -D elastico
-RUN chown -R elastico:elastico /usr/share/elasticsearch
-RUN sed -i "s/:\/bin/:\/bin:\/usr\/share\/elasticsearch\/bin/" /etc/profile
-
-ADD docker-entrypoint.sh /usr/sbin
-VOLUME ["/usr/share/elasticsearch/plugins"]
-VOLUME ["/usr/share/elasticsearch/config"]
-VOLUME ["/usr/share/elasticsearch/data"]
-
-EXPOSE 9200 9300
-
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["elasticsearch"]
-
-
 ##############################################################################
 # openjdk 8-jre
 ##############################################################################
@@ -69,58 +41,44 @@ RUN set -x \
 ##############################################################################
 # grab gosu for easy step-down from root
 ENV GOSU_VERSION 1.7
-RUN set -x \
-	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	&& rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
-	&& chmod +x /usr/local/bin/gosu \
-	&& gosu nobody true
+RUN apk --no-cache add curl && \
+curl -o /usr/local/bin/gosu -sSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-amd64" && \
+chmod +x /usr/local/bin/gosu && gosu nobody true
 
-# https://artifacts.elastic.co/GPG-KEY-elasticsearch
-RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 46095ACC8548582C1A2699A9D27D666CD88E42B4
-
-# https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-repositories.html
-# https://www.elastic.co/guide/en/elasticsearch/reference/5.0/deb.html
-RUN set -x \
-	&& apt-get update && apt-get install -y --no-install-recommends apt-transport-https && rm -rf /var/lib/apt/lists/* \
-	&& echo 'deb https://artifacts.elastic.co/packages/5.x/apt stable main' > /etc/apt/sources.list.d/elasticsearch.list
 
 ENV ELASTICSEARCH_VERSION 5.0.2
 
-RUN set -x \
-	\
-# don't allow the package to install its sysctl file (causes the install to fail)
-# Failed to write '262144' to '/proc/sys/vm/max_map_count': Read-only file system
-	&& dpkg-divert --rename /usr/lib/sysctl.d/elasticsearch.conf \
-	\
-	&& apt-get update \
-	&& apt-get install -y --no-install-recommends elasticsearch=$ELASTICSEARCH_VERSION \
-	&& rm -rf /var/lib/apt/lists/*
+RUN curl https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ELASTICSEARCH_VERSION.tar.gz -o elasticsearch-$ELASTICSEARCH_VERSION.tar.gz && \
+tar -xzf elasticsearch-$ELASTICSEARCH_VERSION.tar.gz && rm elasticsearch-$ELASTICSEARCH_VERSION.tar.gz && \
+mv elasticsearch-$ELASTICSEARCH_VERSION /usr/share/elasticsearch
+
+RUN adduser -DH -s /sbin/nologin elasticsearch && \
+chown -R elasticsearch:elasticsearch /usr/share/elasticsearch && \
+# We replace the banshee to sh since there is no bash in base alpine linux
+sed -i -e '1 s?^#!/bin/bash?#!/bin/sh?g' /usr/share/elasticsearch/bin/elasticsearch
 
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 
 WORKDIR /usr/share/elasticsearch
 
 RUN set -ex \
-	&& for path in \
-		./data \
-		./logs \
-		./config \
-		./config/scripts \
-	; do \
-		mkdir -p "$path"; \
-		chown -R elasticsearch:elasticsearch "$path"; \
-	done
+  && for path in \
+    ./data \
+    ./logs \
+    ./config \
+    ./config/scripts \
+  ; do \
+    mkdir -p "$path"; \
+    chown -R elasticsearch:elasticsearch "$path"; \
+  done
 
 COPY config ./config
+COPY docker-entrypoint.sh /
+RUN chown elasticsearch:elasticsearch /docker-entrypoint.sh
 
 VOLUME /usr/share/elasticsearch/data
 
-COPY docker-entrypoint.sh /
-
 EXPOSE 9200 9300
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["elasticsearch"]
