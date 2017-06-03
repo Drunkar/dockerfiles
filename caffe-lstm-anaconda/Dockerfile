@@ -20,12 +20,12 @@ RUN apt-get update && apt-get install -y \
 ##############################################################################
 # Install Anaconda
 RUN apt-get update && \
-    apt-get install -y wget bzip2 ca-certificates libmysqlclient-dev && \
+    apt-get install -y wget bzip2 ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.3.0-Linux-x86_64.sh && \
-    /bin/bash Anaconda-2.3.0-Linux-x86_64.sh -b -p /opt/conda && \                                 
-    rm Anaconda-2.3.0-Linux-x86_64.sh && \                                                         
+RUN wget --quiet https://repo.continuum.io/archive/Anaconda2-4.4.0-Linux-x86_64.sh && \
+    /bin/bash Anaconda2-4.4.0-Linux-x86_64.sh -b -p /opt/conda && \
+    rm Anaconda2-4.4.0-Linux-x86_64.sh && \
     /opt/conda/bin/conda install --yes conda==3.10.1
 
 ENV PATH /opt/conda/bin:$PATH
@@ -46,38 +46,38 @@ RUN apt-get update && apt-get install -y \
   libleveldb-dev \
   libsnappy-dev \
   libopencv-dev \
-  libboost-all-dev \ 
-  libhdf5-serial-dev \ 
-  protobuf-compiler \ 
-  gcc-4.8 \ 
-  g++-4.8 \ 
-  gcc-4.8-multilib \  
-  g++-4.8-multilib \ 
-  gfortran \ 
-  libjpeg62 \ 
-  libfreeimage-dev \  
-  libatlas-base-dev \  
+  libboost-all-dev \
+  libhdf5-serial-dev \
+  protobuf-compiler \
+  gcc-4.8 \
+  g++-4.8 \
+  gcc-4.8-multilib \
+  g++-4.8-multilib \
+  gfortran \
+  libjpeg62 \
+  libfreeimage-dev \
+  libatlas-base-dev \
   libopenblas-dev \
-  git \ 
-  bc \ 
-  wget \ 
-  curl \ 
-  unzip \ 
-  cmake \ 
-  liblmdb-dev \  
+  git \
+  bc \
+  wget \
+  curl \
+  unzip \
+  cmake \
+  liblmdb-dev \
   pkgconf
 
 # Use gcc 4.8
 RUN update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-4.8 30 && \
-  update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-4.8 30 && \ 
+  update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-4.8 30 && \
   update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 30 && \
   update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 30
 
-# Clone the Caffe repo 
+# Clone the Caffe repo
 RUN cd /opt && git clone https://github.com/jeffdonahue/caffe.git
 RUN cd /opt/caffe && git checkout -b recurrent-rebase-cleanup origin/recurrent-rebase-cleanup
 
-# Glog 
+# Glog
 RUN cd /opt && wget https://github.com/google/glog/archive/v0.3.4.tar.gz -O glog-0.3.4.tar.gz && \
   tar zxvf glog-0.3.4.tar.gz && \
   cd /opt/glog-0.3.4 && \
@@ -85,7 +85,7 @@ RUN cd /opt && wget https://github.com/google/glog/archive/v0.3.4.tar.gz -O glog
   make && \
   make install
 
-# Workaround for error loading libglog: 
+# Workaround for error loading libglog:
 #   error while loading shared libraries: libglog.so.0: cannot open shared object file
 # The system already has /usr/local/lib listed in /etc/ld.so.conf.d/libc.conf, so
 # running `ldconfig` fixes the problem (which is simpler than using $LD_LIBRARY_PATH)
@@ -101,15 +101,15 @@ RUN cd /opt && \
   mkdir build && \
   cd /opt/gflags-master/build && \
   export CXXFLAGS="-fPIC" && \
-  cmake .. && \ 
+  cmake .. && \
   make VERBOSE=1 && \
   make && \
   make install
 
 # Build Caffe core
 RUN cd /opt/caffe && cp Makefile.config.example Makefile.config
-RUN cd /opt/caffe && echo "CPU_ONLY := 1" >> Makefile.config 
-RUN cd /opt/caffe && echo "CXX := /usr/bin/g++-4.8" >> Makefile.config 
+RUN cd /opt/caffe && echo "CPU_ONLY := 1" >> Makefile.config
+RUN cd /opt/caffe && echo "CXX := /usr/bin/g++-4.8" >> Makefile.config
 RUN cd /opt/caffe && sed -i 's/CXX :=/CXX ?=/' Makefile
 RUN cd /opt/caffe && make all
 

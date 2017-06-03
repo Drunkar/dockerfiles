@@ -14,9 +14,9 @@ RUN apt-get update && \
     apt-get install -y wget bzip2 ca-certificates libmysqlclient-dev \
                        build-essential libc6-dev
 
-RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.3.0-Linux-x86_64.sh && \
-    /bin/bash Anaconda-2.3.0-Linux-x86_64.sh -b -p /opt/conda && \                                 
-    rm Anaconda-2.3.0-Linux-x86_64.sh && \                                                         
+RUN wget --quiet https://repo.continuum.io/archive/Anaconda2-4.4.0-Linux-x86_64.sh && \
+    /bin/bash Anaconda2-4.4.0-Linux-x86_64.sh -b -p /opt/conda && \
+    rm Anaconda2-4.4.0-Linux-x86_64.sh && \                                                         
     /opt/conda/bin/conda install --yes conda==3.10.1
 
 ENV PATH /opt/conda/bin:$PATH

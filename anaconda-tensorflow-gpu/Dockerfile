@@ -44,12 +44,12 @@ RUN . ./cuDNN_path.txt && wget -q ${CUDNN_PATH} -O cudnn.tgz && \
 ##############################################################################
 # Install Anaconda
 RUN apt-get update && \
-    apt-get install -y wget bzip2 ca-certificates libmysqlclient-dev && \
+    apt-get install -y wget bzip2 ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget --quiet https://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh && \
-    /bin/bash Anaconda3-4.2.0-Linux-x86_64.sh -b -p /opt/conda && \                                 
-    rm Anaconda3-4.2.0-Linux-x86_64.sh
+RUN wget --quiet https://repo.continuum.io/archive/Anaconda3-4.4.0-Linux-x86_64.sh && \
+    /bin/bash Anaconda3-4.4.0-Linux-x86_64.sh -b -p /opt/conda && \
+    rm Anaconda3-4.4.0-Linux-x86_64.sh
 
 ENV PATH /opt/conda/bin:$PATH
 RUN pip install --upgrade pip
