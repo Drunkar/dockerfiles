@@ -6,7 +6,9 @@ FROM ubuntu:16.04
 MAINTAINER drunkar <drunkars.p@gmail.com>
 
 # locale for tokyo
-RUN cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+RUN apt-get update && \
+  apt-get -y install tzdata locales && \
+  ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
