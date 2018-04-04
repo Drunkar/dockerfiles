@@ -1,6 +1,6 @@
 # airflow
 
-Airflow with:
+Airflow v1.9 with:
 - mysql backend
 - multiple workers (with redis broker)
 
