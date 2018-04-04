@@ -61,18 +61,26 @@ ENV PATH /opt/conda/bin:$PATH
 RUN pip install --upgrade --default-timeout 6000 pip
 
 # install airflow
-RUN apk add --virtual .runtime-deps mariadb-client-libs build-base linux-headers
+RUN apk add --virtual .runtime-deps mariadb-client-libs build-base linux-headers bash
 ENV AIRFLOW_HOME /airflow
 ENV C_FORCE_ROOT true  # run airflow worker by root
-RUN pip install --default-timeout 6000 "apache-airflow[celery, mysql, password]"
+RUN pip install --default-timeout 6000 "apache-airflow[celery, mysql, password, slack, s3, redis]"
+RUN pip install --default-timeout 6000 boto3
 RUN apk del .build-deps mariadb-dev build-base
 ADD entrypoint.sh /root/entrypoint.sh
 ADD entrypoint_webserver.sh /root/entrypoint_webserver.sh
 ADD entrypoint_worker.sh /root/entrypoint_worker.sh
-ADD airflow.cfg /root/airflow.cfg
+ADD entrypoint_flower.sh /root/entrypoint_flower.sh
 RUN chmod +x /root/entrypoint.sh
+RUN chmod +x /root/entrypoint_webserver.sh
+RUN chmod +x /root/entrypoint_worker.sh
+RUN chmod +x /root/entrypoint_flower.sh
+ADD airflow.cfg /root/airflow.cfg
+RUN mkdir -p /airflow/config && touch /airflow/config/__init__.py
+ADD log_config.py /airflow/config/log_config.py
+ENV PYTHONPATH /airflow/config/
 
-VOLUME ["${AIRFLOW_HOME}/dags", "${AIRFLOW_HOME}/logs"]
+VOLUME ["/airflow/dags", "/airflow/logs", "/airflow/plugins"]
 EXPOSE 8080 5555 8793
 WORKDIR ${AIRFLOW_HOME}
 
