@@ -21,7 +21,7 @@ mysql -h"$DB_PORT_3306_TCP_ADDR" -P"$DB_PORT_3306_TCP_PORT" -uroot -p"$DB_ENV_MY
 
 cd src
 
-  printf "DATABASE_URL=mysql://root:${DB_ENV_MYSQL_ROOT_PASSWORD}@${DB_PORT_3306_TCP_ADDR}:${DB_PORT_3306_TCP_PORT}/django_edge\n\nSECRET_KEY=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | sort | uniq`\n" > my_proj/settings/local.env
+  printf "DEBUG=True\n\nDATABASE_URL=mysql://root:${DB_ENV_MYSQL_ROOT_PASSWORD}@${DB_PORT_3306_TCP_ADDR}:${DB_PORT_3306_TCP_PORT}/django_edge\n\nSECRET_KEY=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | sort | uniq`\n" > my_proj/settings/local.env
 
 python manage.py migrate
 
