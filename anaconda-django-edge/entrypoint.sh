@@ -6,7 +6,16 @@ django-admin.py startproject --template=https://github.com/arocks/edge/archive/m
 
 cd my_proj
 
-pip install -r requirements.txt
+pip install django-authtools==1.6.0
+pip install django-braces==1.12.0
+pip install django-crispy-forms==1.7.2
+pip install django-environ==0.4.4
+pip install easy-thumbnails==2.5
+pip install pillow==5.1.0
+pip install pytz==2018.3
+pip install django-debug-toolbar==1.9.1
+pip instal sqlparse==0.2.4
+pip install werkzeug==0.14.1
 
 cd src
 

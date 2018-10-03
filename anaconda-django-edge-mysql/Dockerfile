@@ -33,7 +33,7 @@ RUN pip install --upgrade pip
 ##############################################################################
 # Django
 ##############################################################################
-ENV DJANGO_VERSION 1.11.4
+ENV DJANGO_VERSION 2.1.2
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         mysql-client \
